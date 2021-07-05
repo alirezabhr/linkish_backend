@@ -1,21 +1,56 @@
 from rest_framework import serializers
 
-from .models import Marketer
+from .models import Marketer, Influencer
 
 
 class MarketerSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True
+    )
 
     class Meta:
         model = Marketer
-        fields = '__all__'
+        fields = [
+            "id",
+            "username",
+            "password",
+            "phone",
+            "mail",
+            "company_name",
+            "national_id",
+            "company_code",
+            "ceo_name",
+            "telephone",
+            "address"
+        ]
 
-        # read_only_fields = ("id",)
-        #
-        # def create(self, validated_data):
-        #     return CustomUser(**validated_data)
-        #
-        # def update(self, instance, validated_data):
-        #     instance.username = validated_data.get('username', instance.username)
-        #     instance.password = validated_data.get('password', instance.password)
-        #     instance.first_name = validated_data.get('first_name', instance.first_name)
-        #     return instance
+    def create(self, validated_data):
+        return Marketer.objects.create_marketer(**validated_data)
+
+
+class InfluencerSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True
+    )
+
+    class Meta:
+        model = Influencer
+        fields = [
+            "id",
+            "username",
+            "password",
+            "phone",
+            "mail",
+            "instagram_id",
+            "location",
+            "is_general_page",
+            "card_number",
+            "account_number"
+        ]
+
+    def create(self, validated_data):
+        return Influencer.objects.create_influencer(**validated_data)
