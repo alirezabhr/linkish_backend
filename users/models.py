@@ -26,10 +26,11 @@ class InfluencerManager(BaseUserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    phone = models.CharField(max_length=11)
+    email = models.EmailField(unique=True)
 
+    USERNAME_FIELD = 'email'
     objects = CustomUserManager()  # manager
-    REQUIRED_FIELDS = ['phone']
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return "User: " + self.username
@@ -44,9 +45,10 @@ class Marketer(User):
     company_code = models.IntegerField(unique=True)
     ceo_name = models.CharField(max_length=60)
     telephone = models.CharField(max_length=11)  # e.g:07136234804
-    mail = models.EmailField()
+    # mail = models.EmailField()
     address = models.TextField()
 
+    USERNAME_FIELD = 'email'
     objects = MarketerManager()
 
     def __str__(self):
@@ -58,14 +60,15 @@ class Marketer(User):
 
 class Influencer(User):
     instagram_id = models.CharField(max_length=40, unique=True)
-    mail = models.EmailField(blank=True)
+    # mail = models.EmailField(blank=True)
     location = models.CharField(max_length=30)  # todo should change it to choice field
     is_general_page = models.BooleanField()
     card_number = models.CharField(max_length=16, null=True)
     account_number = models.CharField(max_length=26, null=True)
 
+    USERNAME_FIELD = 'email'
     objects = InfluencerManager()
-    REQUIRED_FIELDS = ['phone']
+    # REQUIRED_FIELDS = ['phone']
 
     def __str__(self):
         return "Influencer: " + self.username
