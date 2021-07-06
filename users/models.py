@@ -6,11 +6,8 @@ from .managers import CustomUserManager
 
 class MarketerManager(BaseUserManager):
 
-    def create_marketer(self, username, phone, mail, company_name, national_id, company_code,
-                        ceo_name, telephone, address, password=None, **extra_fields):
-        marketer = Marketer(username=username, phone=phone, mail=mail, company_name=company_name,
-                            ceo_name=ceo_name, national_id=national_id, company_code=company_code,
-                            telephone=telephone, address=address, is_active=False, **extra_fields)
+    def create_marketer(self, username, phone, mail, password=None, **extra_fields):
+        marketer = Marketer(username=username, phone=phone, mail=mail, is_active=False, **extra_fields)
         marketer.set_password(password)
         marketer.save()
         return marketer
@@ -18,10 +15,10 @@ class MarketerManager(BaseUserManager):
 
 class InfluencerManager(BaseUserManager):
 
-    def create_influencer(self, username, phone, mail, instagram_id, location, is_general_page,
-                          password=None, **extra_fields):
-        influencer = Influencer(username=username, phone=phone, mail=mail, instagram_id=instagram_id,
-                                location=location, is_general_page=is_general_page, **extra_fields)
+    def create_influencer(self, username, phone, mail=None, password=None, **extra_fields):
+        if mail is None:
+            raise TypeError('Users must have an email address.')
+        influencer = Influencer(username=username, phone=phone, mail=mail, **extra_fields)
         influencer.set_password(password)
         influencer.save()
         return influencer
@@ -60,7 +57,7 @@ class Marketer(User):
 
 
 class Influencer(User):
-    instagram_id = models.CharField(max_length=40)
+    instagram_id = models.CharField(max_length=40, unique=True)
     mail = models.EmailField(blank=True)
     location = models.CharField(max_length=30)  # todo should change it to choice field
     is_general_page = models.BooleanField()
