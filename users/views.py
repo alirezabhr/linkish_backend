@@ -19,8 +19,8 @@ class MarketerSignup(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         password = self.request.data.get("password")
-        token_serializer = JSONWebTokenSerializer(data={"username": user.username, "password": password})
-        token_serializer.is_valid(raise_exception=True)     # todo token is not correct in marketer
+        token_serializer = JSONWebTokenSerializer(data={"email": user.email, "password": password})
+        token_serializer.is_valid(raise_exception=True)
         res = {
             "token": token_serializer.validated_data.get("token"),
         }
@@ -37,7 +37,7 @@ class InfluencerSignup(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         password = self.request.data.get("password")
-        token_serializer = JSONWebTokenSerializer(data={"username": user.username, "password": password})
+        token_serializer = JSONWebTokenSerializer(data={"email": user.email, "password": password})
         token_serializer.is_valid(raise_exception=True)
         res = {
             "token": token_serializer.validated_data.get("token"),

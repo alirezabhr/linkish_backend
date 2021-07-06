@@ -14,16 +14,15 @@ class MarketerSerializer(serializers.ModelSerializer):
         model = Marketer
         fields = [
             "id",
-            "username",
+            "email",
             "password",
-            "phone",
-            "mail",
             "company_name",
             "national_id",
             "company_code",
             "ceo_name",
             "telephone",
-            "address"
+            "address",
+            "is_verified"
         ]
 
     def create(self, validated_data):
@@ -41,10 +40,8 @@ class InfluencerSerializer(serializers.ModelSerializer):
         model = Influencer
         fields = [
             "id",
-            "username",
+            "email",
             "password",
-            "phone",
-            "mail",
             "instagram_id",
             "location",
             "is_general_page",

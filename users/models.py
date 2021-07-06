@@ -6,8 +6,8 @@ from .managers import CustomUserManager
 
 class MarketerManager(BaseUserManager):
 
-    def create_marketer(self, username, phone, mail, password=None, **extra_fields):
-        marketer = Marketer(username=username, phone=phone, mail=mail, is_active=False, **extra_fields)
+    def create_marketer(self, email, password=None, **extra_fields):
+        marketer = Marketer(username=email, email=email, **extra_fields)
         marketer.set_password(password)
         marketer.save()
         return marketer
@@ -15,10 +15,10 @@ class MarketerManager(BaseUserManager):
 
 class InfluencerManager(BaseUserManager):
 
-    def create_influencer(self, username, phone, mail=None, password=None, **extra_fields):
-        if mail is None:
+    def create_influencer(self, email, password=None, **extra_fields):
+        if email is None:
             raise TypeError('Users must have an email address.')
-        influencer = Influencer(username=username, phone=phone, mail=mail, **extra_fields)
+        influencer = Influencer(username=email, email=email, **extra_fields)
         influencer.set_password(password)
         influencer.save()
         return influencer
@@ -45,8 +45,8 @@ class Marketer(User):
     company_code = models.IntegerField(unique=True)
     ceo_name = models.CharField(max_length=60)
     telephone = models.CharField(max_length=11)  # e.g:07136234804
-    # mail = models.EmailField()
     address = models.TextField()
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     objects = MarketerManager()
@@ -60,7 +60,6 @@ class Marketer(User):
 
 class Influencer(User):
     instagram_id = models.CharField(max_length=40, unique=True)
-    # mail = models.EmailField(blank=True)
     location = models.CharField(max_length=30)  # todo should change it to choice field
     is_general_page = models.BooleanField()
     card_number = models.CharField(max_length=16, null=True)
@@ -68,7 +67,6 @@ class Influencer(User):
 
     USERNAME_FIELD = 'email'
     objects = InfluencerManager()
-    # REQUIRED_FIELDS = ['phone']
 
     def __str__(self):
         return "Influencer: " + self.username
