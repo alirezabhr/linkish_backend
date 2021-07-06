@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Marketer, Influencer
+from .models import Marketer, Influencer, OTP
 
 
 class MarketerSerializer(serializers.ModelSerializer):
@@ -51,3 +51,12 @@ class InfluencerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Influencer.objects.create_influencer(**validated_data)
+
+
+class OTPSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OTP
+        fields = "__all__"
+
+    read_only_fields = ("id",)

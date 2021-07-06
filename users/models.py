@@ -73,3 +73,12 @@ class Influencer(User):
 
     class Meta:
         verbose_name = "Influencer"
+
+
+class OTP(models.Model):
+    email = models.EmailField()
+    otp_code = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
