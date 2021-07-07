@@ -21,3 +21,13 @@ class CreateAdView(APIView):
             ser.save()
             return Response(ser.data, status=status.HTTP_201_CREATED)
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MarketerAdListView(APIView):
+    serializer_class = AdSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        qs = Ad.objects.filter(marketer=pk)
+        serializer = self.serializer_class(qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
