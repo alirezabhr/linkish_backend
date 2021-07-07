@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import Marketer, Influencer
+from users.models import Marketer, Influencer, Topic
 
 
 # Create your models here.
@@ -11,6 +11,7 @@ class Ad(models.Model):
     clicks = models.IntegerField(default=0)
     marketer = models.ForeignKey(Marketer, on_delete=models.CASCADE)
     max_budget = models.PositiveIntegerField()
+    topics = models.ManyToManyField(Topic, related_name='Ads')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -20,7 +21,7 @@ class Ad(models.Model):
 class InfAd(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
     influencer = models.ForeignKey(Influencer, on_delete=models.CASCADE)
-    clicks = models.IntegerField()
+    clicks = models.IntegerField(default=0)
     short_link = models.CharField(max_length=12)
     is_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
