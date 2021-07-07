@@ -15,12 +15,16 @@ class MarketerManager(BaseUserManager):
 
 class InfluencerManager(BaseUserManager):
 
-    def create_influencer(self, email, password=None, **extra_fields):
+    def create_influencer(self, email, topics=None, password=None, **extra_fields):
         if email is None:
             raise TypeError('Users must have an email address.')
         influencer = Influencer(username=email, email=email, **extra_fields)
         influencer.set_password(password)
         influencer.save()
+        if influencer.is_general_page:
+            influencer.topics.set([])
+        else:
+            influencer.topics.set(topics)
         return influencer
 
 
@@ -71,7 +75,7 @@ class Influencer(User):
     is_general_page = models.BooleanField()
     card_number = models.CharField(max_length=16, null=True)
     account_number = models.CharField(max_length=26, null=True)
-    topics = models.ManyToManyField(Topic, related_name='Influencer_Topics')
+    topics = models.ManyToManyField(Topic, related_name='Influencer_Topics', blank=True)
 
     USERNAME_FIELD = 'email'
     objects = InfluencerManager()
