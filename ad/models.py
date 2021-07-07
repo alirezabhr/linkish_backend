@@ -4,7 +4,7 @@ from users.models import Marketer, Influencer, Topic
 
 
 # Create your models here.
-class Ad(models.Model):
+class Ad(models.Model):     # todo need a boolean field to check if it ahs a general content
     title = models.CharField(max_length=20)
     content = models.FileField(blank=False, null=False)
     base_link = models.CharField(max_length=60)
