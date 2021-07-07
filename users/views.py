@@ -1,4 +1,6 @@
 from random import randint
+
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -35,6 +37,17 @@ class InfluencerSignup(APIView):
     serializer_class = InfluencerSerializer
 
     def post(self, request):
+        try:
+            if not request.data["is_general_page"] and len(request.data["topics"]) == 0:
+                res = {
+                    "error": "topics list is empty!"
+                }
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            res = {
+                "error": "key error"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
