@@ -22,7 +22,6 @@ class MarketerSerializer(serializers.ModelSerializer):
             "ceo_name",
             "telephone",
             "address",
-            "is_verified"
         ]
 
     def create(self, validated_data):
