@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Marketer, Influencer, OTP
+from .models import Topic, Marketer, Influencer, OTP
 
 
 class MarketerSerializer(serializers.ModelSerializer):
@@ -46,7 +46,8 @@ class InfluencerSerializer(serializers.ModelSerializer):
             "location",
             "is_general_page",
             "card_number",
-            "account_number"
+            "account_number",
+            "topics",
         ]
 
     def create(self, validated_data):
@@ -60,3 +61,9 @@ class OTPSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     read_only_fields = ("id",)
+
+
+class TopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = '__all__'

@@ -6,9 +6,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_framework.decorators import api_view, permission_classes
 
-from .models import Marketer, Influencer, OTP
+from .models import Marketer, Influencer, OTP, Topic
 
-from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer
+from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer, TopicSerializer
 
 
 class MarketerSignup(APIView):
@@ -86,3 +86,20 @@ def check_otp(request):
         return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+
+
+class TopicView(APIView):
+    queryset = Topic.objects.all()
+    serializer_class = TopicSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        ser = self.serializer_class(data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_201_CREATED)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        ser = self.serializer_class(self.queryset.all(), many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
