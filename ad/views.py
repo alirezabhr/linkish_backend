@@ -1,3 +1,6 @@
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -6,6 +9,7 @@ from rest_framework.permissions import AllowAny
 
 from .models import Ad, InfAd
 from .serializers import AdSerializer, InfAdSerializer
+from .utils import get_random_link
 
 
 # Create your views here.
@@ -42,6 +46,7 @@ class InfluencerAdView(APIView):
         data = request.data
         data['influencer'] = pk
         data['clicks'] = 0
+        data['short_link'] = get_random_link(InfAd)
 
         inf_ad = self.serializer_class(data=data)
         if inf_ad.is_valid():
@@ -52,3 +57,13 @@ class InfluencerAdView(APIView):
     def get(self, request, pk):
         ser = self.serializer_class(self.queryset.filter(influencer=pk), many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
+
+
+class AdClickDetailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, *args, **kwargs):
+        short_url = kwargs["short_url"]
+        obj = get_object_or_404(InfAd, short_link__exact=short_url)
+        url = obj.ad.base_link
+        return HttpResponseRedirect(url)
