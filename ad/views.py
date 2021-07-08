@@ -24,10 +24,10 @@ class MarketerAdListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
-        data = request.data
+        data = request.POST.copy()
         data['marketer'] = pk
         data['clicks'] = 0
-        ser = self.serializer_class(data=request.data)
+        ser = self.serializer_class(data=data)
         if ser.is_valid():
             ser.save()
             return Response(ser.data, status=status.HTTP_201_CREATED)
