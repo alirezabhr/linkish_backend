@@ -13,21 +13,8 @@ from .utils import get_random_link
 
 
 # Create your views here.
-class CreateAdView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    qs = Ad.objects.all()
-    serializer = AdSerializer
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        ser = self.serializer(data=request.data)
-        if ser.is_valid():
-            ser.save()
-            return Response(ser.data, status=status.HTTP_201_CREATED)
-        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class MarketerAdListView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     serializer_class = AdSerializer
     permission_classes = [AllowAny]
 
@@ -35,6 +22,16 @@ class MarketerAdListView(APIView):
         qs = Ad.objects.filter(marketer=pk)
         serializer = self.serializer_class(qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        data = request.data
+        data['marketer'] = pk
+        data['clicks'] = 0
+        ser = self.serializer_class(data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_201_CREATED)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class InfluencerAdView(APIView):
