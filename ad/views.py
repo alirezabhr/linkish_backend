@@ -25,6 +25,31 @@ class MarketerAdListView(APIView):
 
     def post(self, request, pk):
         data = request.POST.copy()
+        try:
+            if not request.data["is_general"] and len(request.data["topics"]) == 0:
+                res = {
+                    "error": "topics list is empty!"
+                }
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            res = {
+                "error": "key error"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
+        data['video'] = request.data['video']
+
+        if not data['is_video']:
+            data['video'] = ''
+        else:
+            if data['video'] == '':
+                res = {
+                    "error": "video field is empty"
+                }
+                return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
+        data['image'] = request.data["image"]
+        print(data)
         data['marketer'] = pk
         data['clicks'] = 0
         ser = self.serializer_class(data=data)
@@ -63,4 +88,8 @@ class AdClickDetailView(APIView):
         short_url = kwargs["short_url"]
         obj = get_object_or_404(InfAd, short_link__exact=short_url)
         url = obj.ad.base_link
+        obj.clicks += 1
+        obj.ad.clicks += 1
+        obj.save()
+        obj.ad.save()
         return HttpResponseRedirect(url)

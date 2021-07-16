@@ -8,6 +8,9 @@ class AdSerializer(serializers.ModelSerializer):
         model = Ad
         fields = '__all__'
 
+    def validated_image(self, image):
+        print("image: ", image)
+
 
 class InfAdSerializer(serializers.ModelSerializer):
     class Meta:
