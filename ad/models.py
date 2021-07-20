@@ -21,7 +21,7 @@ class Ad(models.Model):
         return str(self.id) + ": " + self.title + "-" + self.marketer.company_name
 
 
-class InfAd(models.Model):
+class InfAd(models.Model):      # todo InfAd should change, it should have a disable option
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
     influencer = models.ForeignKey(Influencer, on_delete=models.CASCADE)
     clicks = models.IntegerField(default=0)
