@@ -77,23 +77,44 @@ class SuggestAdView(APIView):
 
 class InfluencerAdView(APIView):
     serializer_class = InfAdSerializer
-    queryset = InfAd.objects.all()
     permission_classes = [AllowAny]
 
     def post(self, request, pk):
+        get_object_or_404(Influencer, pk=pk)
         data = request.data
-        data['influencer'] = pk
+        try:
+            suggested_ad_id = data['suggested_ad']
+        except:
+            res = {
+                "error": "suggested_ad needed"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+        suggested_ad = get_object_or_404(SuggestAd, pk=suggested_ad_id)
         data['clicks'] = 0
         data['short_link'] = get_random_link(InfAd)
+        if suggested_ad.influencer.id != pk:
+            res = {
+                "error": "this ad didn't suggested to this influencer"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
+        if suggested_ad.is_approved:
+            res = {
+                "error": "this ad was approved"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
         inf_ad = self.serializer_class(data=data)
         if inf_ad.is_valid():
+            suggested_ad.is_approved = True
+            suggested_ad.save()
             inf_ad.save()
             return Response(inf_ad.data, status=status.HTTP_201_CREATED)
         return Response(inf_ad.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, pk):
-        ser = self.serializer_class(self.queryset.filter(influencer=pk), many=True)
+        query_set = SuggestAd.objects.filter(influencer_id=pk)
+        ser = SuggestAdSerializer(query_set, many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
 
 
