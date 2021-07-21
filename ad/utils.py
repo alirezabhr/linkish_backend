@@ -1,5 +1,7 @@
 import random
 import string
+import datetime
+import django.utils.timezone as django_tz
 
 
 def generate_random_string(size=6, chars=string.ascii_letters + string.digits):
@@ -20,4 +22,8 @@ def get_random_link(instance, size=6):
 
 
 def is_after_24h(time):
-    print(time)
+    now = django_tz.now()
+    timedelta_per_second = (now-time).total_seconds()
+    if timedelta_per_second/(3600*24) > 1:
+        return True
+    return False
