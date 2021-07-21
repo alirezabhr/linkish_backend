@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -73,6 +74,46 @@ class SuggestAdView(APIView):
             ser.save()
             return Response(ser.data, status=status.HTTP_201_CREATED)
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def influencer_approved_ads(*args, **kwargs):
+    pk = kwargs['pk']
+    try:
+        Influencer.objects.get(pk=pk)
+    except:
+        result = {
+            "error": "influencer with this pk does not exist"
+        }
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+    ad_id_list = []
+    for item in SuggestAd.objects.filter(influencer_id=pk, is_approved=True):
+        ad_id_list.append(Ad.objects.get(id=item.ad.id))
+
+    ser = AdSerializer(ad_id_list, many=True)
+    return Response(ser.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def influencer_disapproved_ads(*args, **kwargs):
+    pk = kwargs['pk']
+    try:
+        Influencer.objects.get(pk=pk)
+    except:
+        result = {
+            "error": "influencer with this pk does not exist"
+        }
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+    ad_id_list = []
+    for item in SuggestAd.objects.filter(influencer_id=pk, is_approved=False):
+        ad_id_list.append(Ad.objects.get(id=item.ad.id))
+
+    ser = AdSerializer(ad_id_list, many=True)
+    return Response(ser.data, status=status.HTTP_200_OK)
 
 
 class InfluencerAdView(APIView):
