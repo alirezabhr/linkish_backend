@@ -17,3 +17,7 @@ def get_random_link(instance, size=6):
         return get_random_link(instance=instance, size=size)
 
     return new_str
+
+
+def is_after_24h(time):
+    print(time)

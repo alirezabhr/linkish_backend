@@ -7,9 +7,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from .models import Ad, InfAd
-from .serializers import AdSerializer, InfAdSerializer
-from .utils import get_random_link
+from users.models import Influencer
+from .models import Ad, InfAd, SuggestAd
+from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer
+from .utils import get_random_link, is_after_24h
 
 
 # Create your views here.
@@ -49,9 +50,24 @@ class MarketerAdListView(APIView):
                 return Response(res, status=status.HTTP_400_BAD_REQUEST)
 
         data['image'] = request.data["image"]
-        print(data)
         data['marketer'] = pk
         data['clicks'] = 0
+        ser = self.serializer_class(data=data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_201_CREATED)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SuggestAdView(APIView):
+    query_set = SuggestAd.objects.all()
+    serializer_class = SuggestAdSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, pk):
+        get_object_or_404(Influencer, pk=pk)
+        data = request.data
+        data['influencer'] = pk
         ser = self.serializer_class(data=data)
         if ser.is_valid():
             ser.save()
@@ -87,9 +103,15 @@ class AdClickDetailView(APIView):
     def get(self, *args, **kwargs):
         short_url = kwargs["short_url"]
         obj = get_object_or_404(InfAd, short_link__exact=short_url)
-        url = obj.ad.base_link
+        if is_after_24h(obj.approved_at):
+            res = {
+                "error": "this ad is expired"
+            }
+            return Response(res, status=status.HTTP_404_NOT_FOUND)
+
+        url = obj.suggested_ad.ad.base_link
         obj.clicks += 1
-        obj.ad.clicks += 1
+        obj.suggested_ad.ad.clicks += 1
         obj.save()
-        obj.ad.save()
+        obj.suggested_ad.ad.save()
         return HttpResponseRedirect(url)

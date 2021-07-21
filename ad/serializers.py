@@ -1,11 +1,17 @@
 from rest_framework import serializers
 
-from .models import Ad, InfAd
+from .models import Ad, InfAd, SuggestAd
 
 
 class AdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ad
+        fields = '__all__'
+
+
+class SuggestAdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SuggestAd
         fields = '__all__'
 
 
