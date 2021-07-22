@@ -89,11 +89,16 @@ def influencer_approved_ads(*args, **kwargs):
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
     ad_id_list = []
-    for item in SuggestAd.objects.filter(influencer_id=pk, is_approved=True):
-        ad_id_list.append(Ad.objects.get(id=item.ad.id))
+    for suggested_ad in SuggestAd.objects.filter(influencer_id=pk, is_approved=True):
+        inf_ad = InfAd.objects.get(suggested_ad=suggested_ad.id)
+        ser = AdSerializer(suggested_ad.ad)
+        result_item = {
+            "short_link": inf_ad.short_link,
+            "ad": ser.data,
+        }
+        ad_id_list.append(result_item)
 
-    ser = AdSerializer(ad_id_list, many=True)
-    return Response(ser.data, status=status.HTTP_200_OK)
+    return Response(ad_id_list, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
