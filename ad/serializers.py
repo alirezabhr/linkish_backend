@@ -13,6 +13,7 @@ class SuggestAdSerializer(serializers.ModelSerializer):
     class Meta:
         model = SuggestAd
         fields = '__all__'
+        depth = 1
 
 
 class InfAdSerializer(serializers.ModelSerializer):
