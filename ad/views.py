@@ -113,8 +113,17 @@ class InfluencerAdView(APIView):
             return Response(inf_ad.data, status=status.HTTP_201_CREATED)
         return Response(inf_ad.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, pk):
+        get_object_or_404(Influencer, pk=pk)
+        suggested_ad = get_object_or_404(SuggestAd, pk=request.data['suggested_ad'])
+        serializer = SuggestAdSerializer(suggested_ad, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def get(self, request, pk):
-        query_set = SuggestAd.objects.filter(influencer_id=pk)
+        query_set = SuggestAd.objects.filter(influencer_id=pk, is_rejected=False, is_reported=False)
         ser = SuggestAdSerializer(query_set, many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
 

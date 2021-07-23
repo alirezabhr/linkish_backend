@@ -25,6 +25,9 @@ class SuggestAd(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
     influencer = models.ForeignKey(Influencer, on_delete=models.CASCADE)
     is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    is_reported = models.BooleanField(default=False)
+    report_msg = models.CharField(max_length=30, null=True)
     suggested_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
