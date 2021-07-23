@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 
 from users.models import Influencer
 from .models import Ad, InfAd, SuggestAd
-from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer
+from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2
 from .utils import get_random_link, is_after_24h
 
 
@@ -62,7 +62,7 @@ class MarketerAdListView(APIView):
 
 class SuggestAdView(APIView):
     query_set = SuggestAd.objects.all()
-    serializer_class = SuggestAdSerializer
+    serializer_class = SuggestAdSerializer2
     permission_classes = [AllowAny]
 
     def post(self, request, pk):

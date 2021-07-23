@@ -9,6 +9,12 @@ class AdSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SuggestAdSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = SuggestAd
+        fields = '__all__'
+
+
 class SuggestAdSerializer(serializers.ModelSerializer):
     class Meta:
         model = SuggestAd
