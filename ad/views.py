@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 
 from users.models import Influencer
 from .models import Ad, InfAd, SuggestAd
-from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2
+from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2
 from .utils import get_random_link, is_after_24h
 
 
@@ -125,6 +125,17 @@ class InfluencerAdView(APIView):
     def get(self, request, pk):
         query_set = SuggestAd.objects.filter(influencer_id=pk, is_rejected=False, is_reported=False)
         ser = SuggestAdSerializer(query_set, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+
+class ApprovedAdList(APIView):
+    serializer_class = InfAdSerializer2
+    permission_classes = [AllowAny]
+    query_set = InfAd.objects.all()
+
+    def get(self, request, pk):
+        qs = self.query_set.filter(suggested_ad__influencer=pk)
+        ser = self.serializer_class(qs, many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
 
 

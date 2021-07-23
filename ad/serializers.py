@@ -26,3 +26,11 @@ class InfAdSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfAd
         fields = '__all__'
+
+
+class InfAdSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = InfAd
+        fields = '__all__'
+        depth = 2
+
