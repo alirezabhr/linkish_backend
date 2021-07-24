@@ -25,6 +25,7 @@ class MarketerSignup(APIView):
         token_serializer = JSONWebTokenSerializer(data={"email": user.email, "password": password})
         token_serializer.is_valid(raise_exception=True)
         res = {
+            "id": user.id,
             "token": token_serializer.validated_data.get("token"),
         }
         return Response(res, status=status.HTTP_201_CREATED)
@@ -54,6 +55,7 @@ class InfluencerSignup(APIView):
         token_serializer = JSONWebTokenSerializer(data={"email": user.email, "password": password})
         token_serializer.is_valid(raise_exception=True)
         res = {
+            "id": user.id,
             "token": token_serializer.validated_data.get("token"),
         }
         return Response(res, status=status.HTTP_201_CREATED)
