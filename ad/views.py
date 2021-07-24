@@ -1,6 +1,5 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -18,7 +17,6 @@ from .utils import get_random_link, is_after_24h
 class MarketerAdListView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AdSerializer
-    permission_classes = [AllowAny]
 
     def get(self, request, pk):
         qs = Ad.objects.filter(marketer=pk)
@@ -63,7 +61,6 @@ class MarketerAdListView(APIView):
 class SuggestAdView(APIView):
     query_set = SuggestAd.objects.all()
     serializer_class = SuggestAdSerializer2
-    permission_classes = [AllowAny]
 
     def post(self, request, pk):
         get_object_or_404(Influencer, pk=pk)
@@ -78,7 +75,6 @@ class SuggestAdView(APIView):
 
 class InfluencerAdView(APIView):
     serializer_class = InfAdSerializer
-    permission_classes = [AllowAny]
 
     def post(self, request, pk):
         get_object_or_404(Influencer, pk=pk)
@@ -130,7 +126,6 @@ class InfluencerAdView(APIView):
 
 class ApprovedAdList(APIView):
     serializer_class = InfAdSerializer2
-    permission_classes = [AllowAny]
     query_set = InfAd.objects.all()
 
     def get(self, request, pk):
@@ -149,7 +144,7 @@ class AdClickDetailView(APIView):
             res = {
                 "error": "this ad is expired"
             }
-            return Response(res, status=status.HTTP_404_NOT_FOUND)
+            return Response(res, status=status.HTTP_404_NOT_FOUND)  # todo should Redirect to empty state page
 
         url = obj.suggested_ad.ad.base_link
         obj.clicks += 1

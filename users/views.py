@@ -1,6 +1,5 @@
 from random import randint
 
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -104,7 +103,6 @@ def check_otp(request):
 class TopicView(APIView):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
-    permission_classes = [AllowAny]
 
     def post(self, request):
         ser = self.serializer_class(data=request.data)
