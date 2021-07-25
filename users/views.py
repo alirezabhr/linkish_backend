@@ -105,8 +105,9 @@ def check_otp(request):
 class TopicView(APIView):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
+    permission_classes = [AllowAny]
 
-    def post(self, request):
+    def post(self, request):    # todo need to change permission for post or remove it
         ser = self.serializer_class(data=request.data)
         if ser.is_valid():
             ser.save()
