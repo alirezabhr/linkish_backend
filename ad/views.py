@@ -13,6 +13,9 @@ from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, Sug
 from .utils import get_random_link, is_after_24h
 
 
+COST_PER_CLICK = 150
+
+
 # Create your views here.
 class MarketerAdListView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -152,3 +155,22 @@ class AdClickDetailView(APIView):
         obj.save()
         obj.suggested_ad.ad.save()
         return HttpResponseRedirect(url)
+
+
+class InfluencerWallet(APIView):
+    serializer_class = InfAdSerializer2
+    query_set = InfAd.objects.all()
+
+    def get(self, request, pk):
+        qs = self.query_set.filter(suggested_ad__influencer=pk)
+        result = []
+
+        for item in qs:
+            ser = self.serializer_class(item)
+            res = {
+                "income": item.clicks * COST_PER_CLICK,
+                "influencer_ad": ser.data
+            }
+            result.append(res)
+
+        return Response(result, status=status.HTTP_200_OK)
