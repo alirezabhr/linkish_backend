@@ -1,5 +1,6 @@
 from random import randint
 
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -116,4 +117,57 @@ class TopicView(APIView):
 
     def get(self, request):
         ser = self.serializer_class(self.queryset.all(), many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def update_influencer(request):
+    try:
+        influencer = Influencer.objects.get(pk=request.data['pk'])
+    except:
+        result = {
+            "error": "pk is incorrect"
+        }
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+    data = {
+        "card_number": request.data['card_number'],
+        "account_number": request.data['account_number']
+    }
+    ser = InfluencerSerializer(influencer, data=data)
+    if ser.is_valid():
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+    return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateInfluencer(APIView):
+    serializer_class = InfluencerSerializer
+    query_set = Influencer.objects.all()
+
+    def put(self, request, pk):
+        influencer = get_object_or_404(Influencer, pk=pk)
+        data = {}
+
+        try:
+            data['card_number'] = request.data['card_number']
+            data['account_number'] = request.data['account_number']
+        except:
+            res = {
+                "error": "card number or account number does not exist"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+        data['email'] = influencer.email
+        data['password'] = influencer.password
+        data['instagram_id'] = influencer.instagram_id
+        data['location'] = influencer.location
+        data['is_general_page'] = influencer.is_general_page
+        ser = self.serializer_class(influencer, data=data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk):
+        influencer = get_object_or_404(Influencer, pk=pk)
+        ser = self.serializer_class(influencer)
         return Response(ser.data, status=status.HTTP_200_OK)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('signup/marketer/', views.MarketerSignup.as_view()),
     path('signup/influencer/', views.InfluencerSignup.as_view()),
     path('topic/', views.TopicView.as_view()),
+    path('influencer/<int:pk>/', views.UpdateInfluencer.as_view()),
 ]
