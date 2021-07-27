@@ -10,4 +10,5 @@ urlpatterns = [
     path('signup/influencer/', views.InfluencerSignup.as_view()),
     path('topic/', views.TopicView.as_view()),
     path('influencer/<int:pk>/', views.UpdateInfluencer.as_view()),
+    path('change-pass/<int:pk>/', views.ChangePassword.as_view()),
 ]

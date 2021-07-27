@@ -118,7 +118,7 @@ JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER':
     'rest_framework_jwt.utils.jwt_response_payload_handler',
 
-    # 'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,

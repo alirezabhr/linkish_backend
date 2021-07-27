@@ -171,3 +171,40 @@ class UpdateInfluencer(APIView):
         influencer = get_object_or_404(Influencer, pk=pk)
         ser = self.serializer_class(influencer)
         return Response(ser.data, status=status.HTTP_200_OK)
+
+
+class ChangePassword(APIView):
+    serializer_class = InfluencerSerializer
+    query_set = Influencer.objects.all()
+
+    def put(self, request, pk):
+        influencer = get_object_or_404(Influencer, pk=pk)
+        data = {}
+
+        try:
+            current_pass = request.data['current_pass']
+            new_pass = request.data['new_pass']
+        except:
+            res = {
+                "error": "new_pass or current_pass does not exist"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
+        if not influencer.check_password(current_pass):
+            res = {
+                "error": "current password is not correct"
+            }
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
+        influencer.set_password(new_pass)
+        influencer.save()
+        data['password'] = influencer.password
+        data['email'] = influencer.email
+        data['instagram_id'] = influencer.instagram_id
+        data['location'] = influencer.location
+        data['is_general_page'] = influencer.is_general_page
+        ser = self.serializer_class(influencer, data=data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
