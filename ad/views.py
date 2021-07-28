@@ -11,6 +11,7 @@ from users.models import Influencer
 from .models import Ad, InfAd, SuggestAd
 from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2
 from .utils import get_random_link, is_after_24h
+from users.utils import send_suggest_ad_email
 
 
 COST_PER_CLICK = 150
@@ -66,12 +67,17 @@ class SuggestAdView(APIView):
     serializer_class = SuggestAdSerializer2
 
     def post(self, request, pk):
-        get_object_or_404(Influencer, pk=pk)
+        influencer = get_object_or_404(Influencer, pk=pk)
         data = request.data
         data['influencer'] = pk
+        try:
+            ad = get_object_or_404(Ad, pk=request.data['ad'])
+        except Ad.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         ser = self.serializer_class(data=data)
         if ser.is_valid():
             ser.save()
+            send_suggest_ad_email(influencer.email, ad.title)
             return Response(ser.data, status=status.HTTP_201_CREATED)
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
