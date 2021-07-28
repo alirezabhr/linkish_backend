@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from .models import Marketer, Influencer, OTP, Topic
 from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer, TopicSerializer, WithdrawSerializer
-from .utils import send_otp_email, send_withdraw_email
+from . import utils as user_utils
 
 
 class MarketerSignup(APIView):
@@ -69,7 +69,7 @@ def send_otp_email(request):
     num = randint(10000, 99999)
     data['otp_code'] = num
     try:
-        send_otp_email(num, request.data.get("email"))
+        user_utils.send_otp_email(num, request.data.get("email"))
     except:
         result = {
             "error": "can not send email"
@@ -228,7 +228,7 @@ class WithdrawView(APIView):
         ser = self.serializer_class(data=data)
         if ser.is_valid():
             try:
-                send_withdraw_email(influencer.email, request.data['amount'])
+                user_utils.send_withdraw_email(influencer.email, request.data['amount'])
                 ser.save()
                 return Response(ser.data, status=status.HTTP_200_OK)
             except:
