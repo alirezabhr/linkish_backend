@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Topic, Marketer, Influencer, OTP
+from .models import Topic, Marketer, Influencer, OTP, Withdraw
 
 
 class MarketerSerializer(serializers.ModelSerializer):
@@ -65,4 +65,10 @@ class OTPSerializer(serializers.ModelSerializer):
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
+        fields = '__all__'
+
+
+class WithdrawSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Withdraw
         fields = '__all__'

@@ -33,4 +33,3 @@ class InfAdSerializer2(serializers.ModelSerializer):
         model = InfAd
         fields = '__all__'
         depth = 2
-

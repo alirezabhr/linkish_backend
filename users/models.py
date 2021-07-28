@@ -108,3 +108,13 @@ class OTP(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class Withdraw(models.Model):
+    influencer = models.ForeignKey(Influencer, on_delete=models.PROTECT)
+    amount = models.IntegerField()
+    is_paid = models.BooleanField(default=False)
+    request_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.influencer.instagram_id + " -> " + str(self.amount) + "T"

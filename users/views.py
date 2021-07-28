@@ -9,7 +9,7 @@ from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_framework.decorators import api_view, permission_classes
 
 from .models import Marketer, Influencer, OTP, Topic
-from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer, TopicSerializer
+from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer, TopicSerializer, WithdrawSerializer
 from .utils import send_otp_email, send_withdraw_email
 
 
@@ -216,16 +216,23 @@ class ChangePassword(APIView):
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Withdraw(APIView):
+class WithdrawView(APIView):
+    serializer_class = WithdrawSerializer
 
     def post(self, request, pk):
         influencer = get_object_or_404(Influencer, pk=pk)
-        try:
-            send_withdraw_email(influencer.email, request.data['amount'])
-        except:
-            result = {"error": "Sry, Withdraw was unsuccessful. Please try later"}
-            return Response(result, status=status.HTTP_200_OK)
-        result = {
-            "success": "your withdraw request was successful"
+        data = {
+            "influencer": pk,
+            "amount": request.data["amount"]
         }
-        return Response(result, status=status.HTTP_200_OK)
+        ser = self.serializer_class(data=data)
+        if ser.is_valid():
+            try:
+                send_withdraw_email(influencer.email, request.data['amount'])
+                ser.save()
+                return Response(ser.data, status=status.HTTP_200_OK)
+            except:
+                result = {"error": "Sry, Withdraw was unsuccessful. Please try later"}
+                return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        else:
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
