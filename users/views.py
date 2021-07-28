@@ -9,8 +9,8 @@ from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_framework.decorators import api_view, permission_classes
 
 from .models import Marketer, Influencer, OTP, Topic
-
 from .serializers import MarketerSerializer, InfluencerSerializer, OTPSerializer, TopicSerializer
+from .utils import send_otp_email, send_withdraw_email
 
 
 class MarketerSignup(APIView):
@@ -68,7 +68,13 @@ def send_otp_email(request):
     data = request.data
     num = randint(10000, 99999)
     data['otp_code'] = num
-    # todo send email
+    try:
+        send_otp_email(num, request.data.get("email"))
+    except:
+        result = {
+            "error": "can not send email"
+        }
+        return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     try:
         obj = OTP.objects.get(email=request.data.get("email"))
         ser = OTPSerializer(obj, data=data)
@@ -108,7 +114,7 @@ class TopicView(APIView):
     serializer_class = TopicSerializer
     permission_classes = [AllowAny]
 
-    def post(self, request):    # todo need to change permission for post or remove it
+    def post(self, request):  # todo need to change permission for post or remove it
         ser = self.serializer_class(data=request.data)
         if ser.is_valid():
             ser.save()
@@ -208,3 +214,18 @@ class ChangePassword(APIView):
             ser.save()
             return Response(ser.data, status=status.HTTP_200_OK)
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Withdraw(APIView):
+
+    def post(self, request, pk):
+        influencer = get_object_or_404(Influencer, pk=pk)
+        try:
+            send_withdraw_email(influencer.email, request.data['amount'])
+        except:
+            result = {"error": "Sry, Withdraw was unsuccessful. Please try later"}
+            return Response(result, status=status.HTTP_200_OK)
+        result = {
+            "success": "your withdraw request was successful"
+        }
+        return Response(result, status=status.HTTP_200_OK)

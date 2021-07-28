@@ -11,4 +11,5 @@ urlpatterns = [
     path('topic/', views.TopicView.as_view()),
     path('influencer/<int:pk>/', views.UpdateInfluencer.as_view()),
     path('change-pass/<int:pk>/', views.ChangePassword.as_view()),
+    path('withdraw/<int:pk>/', views.Withdraw.as_view()),
 ]
