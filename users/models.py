@@ -69,23 +69,10 @@ class Marketer(User):
         verbose_name = "Marketer"
 
 
-class Province(models.Model):
-    name = models.CharField(max_length=20)
-
-
-class City(models.Model):
-    name = models.CharField(max_length=20)
-    province = models.ForeignKey(Province, on_delete=models.CASCADE)
-
-
-class Location(models.Model):
-    city = models.ForeignKey(City, on_delete=models.CASCADE)
-
-
 class Influencer(User):
     instagram_id = models.CharField(max_length=40, unique=True)
-    location = models.CharField(max_length=30)  # todo should change it to choice field
-    # location = models.ForeignKey(Location, on_delete=models.PROTECT)
+    province = models.CharField(max_length=30)
+    city = models.CharField(max_length=25)
     is_general_page = models.BooleanField()
     card_number = models.CharField(max_length=16, null=True)
     account_number = models.CharField(max_length=26, null=True)

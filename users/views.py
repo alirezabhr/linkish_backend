@@ -165,7 +165,8 @@ class UpdateInfluencer(APIView):
         data['email'] = influencer.email
         data['password'] = influencer.password
         data['instagram_id'] = influencer.instagram_id
-        data['location'] = influencer.location
+        data['province'] = influencer.province
+        data['city'] = influencer.city
         data['is_general_page'] = influencer.is_general_page
         ser = self.serializer_class(influencer, data=data)
         if ser.is_valid():
@@ -207,7 +208,8 @@ class ChangePassword(APIView):
         data['password'] = influencer.password
         data['email'] = influencer.email
         data['instagram_id'] = influencer.instagram_id
-        data['location'] = influencer.location
+        data['province'] = influencer.province
+        data['city'] = influencer.city
         data['is_general_page'] = influencer.is_general_page
         ser = self.serializer_class(influencer, data=data)
         if ser.is_valid():
