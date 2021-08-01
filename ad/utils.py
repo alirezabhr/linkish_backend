@@ -44,3 +44,7 @@ def is_in_iran(ip):
     if country.country.iso_code == 'IR':
         return True
     return False
+
+
+def get_http_referer(meta_data):
+    return meta_data.get('HTTP_REFERER')
