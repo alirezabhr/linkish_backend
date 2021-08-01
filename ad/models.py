@@ -11,6 +11,7 @@ class Ad(models.Model):
     video = models.FileField(blank=True, null=False)
     base_link = models.CharField(max_length=60)
     clicks = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
     marketer = models.ForeignKey(Marketer, on_delete=models.CASCADE)
     max_budget = models.PositiveIntegerField()
     is_general = models.BooleanField()
@@ -40,8 +41,16 @@ class SuggestAd(models.Model):
 class InfAd(models.Model):
     suggested_ad = models.ForeignKey(SuggestAd, on_delete=models.CASCADE)
     clicks = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
     short_link = models.CharField(max_length=7, blank=True)
     approved_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.id) + "- instagram: " + self.suggested_ad.influencer.instagram_id
+
+
+class AdViewerDetail(models.Model):
+    influencer_ad = models.ForeignKey(InfAd, on_delete=models.CASCADE)
+    ip = models.CharField(max_length=80)
+    http_referer = models.CharField(max_length=60, null=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
