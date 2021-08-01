@@ -1,14 +1,13 @@
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 
 def send_email(receivers, subject, body):
-    send_mail(
+    msg = EmailMessage(
         subject,
         body,
-        'mehdi.ali.project@gmail.com',
-        receivers,
-        fail_silently=False,
+        to=receivers,
     )
+    msg.send()
 
 
 def send_otp_email(otp, receiver):

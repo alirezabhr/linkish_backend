@@ -153,8 +153,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+DEFAULT_FROM_EMAIL = 'noreply@linkish.ir'
+SERVER_EMAIL = 'noreply@linkish.ir'
+EMAIL_HOST = 'ircln08.ihglobaldns.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'mehdi.ali.project@gmail.com'
-EMAIL_HOST_PASSWORD = 'mehdiali1400'
+EMAIL_HOST_USER = 'noreply@linkish.ir'
+EMAIL_HOST_PASSWORD = 'Mehd!_@l!rez@_1400'
 EMAIL_USE_TLS = True
