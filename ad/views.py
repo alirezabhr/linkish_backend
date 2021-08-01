@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.template import loader
 
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -8,9 +10,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from users.models import Influencer
-from .models import Ad, InfAd, SuggestAd
+from .models import Ad, InfAd, SuggestAd, AdViewerDetail
 from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2
-from .utils import get_random_link, is_after_24h
+from . import utils as adUtils
 from users.utils import send_suggest_ad_email
 
 
@@ -55,6 +57,7 @@ class MarketerAdListView(APIView):
         data['image'] = request.data["image"]
         data['marketer'] = pk
         data['clicks'] = 0
+        data['views'] = 0
         ser = self.serializer_class(data=data)
         if ser.is_valid():
             ser.save()
@@ -97,7 +100,8 @@ class InfluencerAdView(APIView):
             return Response(res, status=status.HTTP_400_BAD_REQUEST)
         suggested_ad = get_object_or_404(SuggestAd, pk=suggested_ad_id)
         data['clicks'] = 0
-        data['short_link'] = get_random_link(InfAd)
+        data['views'] = 0
+        data['short_link'] = adUtils.get_random_link(InfAd)
         if suggested_ad.influencer.id != pk:
             res = {
                 "error": "this ad didn't suggested to this influencer"
@@ -146,21 +150,50 @@ class ApprovedAdList(APIView):
 class AdClickDetailView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, *args, **kwargs):
-        short_url = kwargs["short_url"]
-        obj = get_object_or_404(InfAd, short_link__exact=short_url)
-        if is_after_24h(obj.approved_at):
-            res = {
-                "error": "this ad is expired"
-            }
-            return Response(res, status=status.HTTP_404_NOT_FOUND)  # todo should Redirect to empty state page
+    def create_ad_viewer_detail(self, inf_ad, ip, meta_data):
+        ad_viewer_detail = AdViewerDetail()
+        ad_viewer_detail.influencer_ad = inf_ad.id
+        ad_viewer_detail.ip = ip
+        ad_viewer_detail.http_referer = adUtils.get_http_referer(meta_data)
+        ad_viewer_detail.save()
 
-        url = obj.suggested_ad.ad.base_link
-        obj.clicks += 1
-        obj.suggested_ad.ad.clicks += 1
-        obj.save()
-        obj.suggested_ad.ad.save()
-        return HttpResponseRedirect(url)
+    def is_valid_request(self, inf_ad, ip, meta_data):
+        http_referer = adUtils.get_http_referer(meta_data)
+        if http_referer[-13:] != 'instagram.com':
+            return False
+        qs = AdViewerDetail.objects.filter(influencer_ad=inf_ad.id, ip=ip)
+        if len(qs) != 0:
+            return False
+        return True
+
+    def get(self, request, *args, **kwargs):
+        short_url = kwargs["short_url"]
+        influencer_ad = get_object_or_404(InfAd, short_link__exact=short_url)
+
+        if adUtils.is_after_24h(influencer_ad.approved_at):
+            return render(request, 'expire_ad.html')
+        else:
+            ip = adUtils.get_client_ip(request)
+
+            if adUtils.is_in_iran(ip):
+                url = influencer_ad.suggested_ad.ad.base_link
+                if self.is_valid_request(influencer_ad, ip, request.META):
+                    influencer_ad.clicks += 1
+                    influencer_ad.views += 1
+                    influencer_ad.suggested_ad.ad.clicks += 1
+                    influencer_ad.suggested_ad.ad.views += 1
+                    influencer_ad.save()
+                    influencer_ad.suggested_ad.ad.save()
+                else:
+                    influencer_ad.views += 1
+                    influencer_ad.suggested_ad.ad.views += 1
+                    influencer_ad.save()
+                    influencer_ad.suggested_ad.ad.save()
+
+                self.create_ad_viewer_detail(influencer_ad, ip, request.META)
+                return HttpResponseRedirect(url)
+            else:
+                return render(request, 'vpn.html')
 
 
 class InfluencerWallet(APIView):
