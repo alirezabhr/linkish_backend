@@ -42,6 +42,7 @@ class InfAd(models.Model):
     suggested_ad = models.ForeignKey(SuggestAd, on_delete=models.CASCADE)
     clicks = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
+    deduction = models.IntegerField(default=10)
     short_link = models.CharField(max_length=7, blank=True)
     approved_at = models.DateTimeField(auto_now_add=True)
 
