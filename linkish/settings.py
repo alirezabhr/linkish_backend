@@ -144,6 +144,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -160,3 +161,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'noreply@linkish.ir'
 EMAIL_HOST_PASSWORD = 'Mehd!_@l!rez@_1400'
 EMAIL_USE_TLS = True
+
+COST_PER_CLICK = 150

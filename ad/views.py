@@ -1,7 +1,6 @@
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
-from django.template import loader
 
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -14,9 +13,6 @@ from .models import Ad, InfAd, SuggestAd, AdViewerDetail
 from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2
 from . import utils as adUtils
 from users.utils import send_suggest_ad_email
-
-
-COST_PER_CLICK = 150
 
 
 # Create your views here.
@@ -159,6 +155,8 @@ class AdClickDetailView(APIView):
 
     def is_valid_request(self, inf_ad, ip, meta_data):
         http_referer = adUtils.get_http_referer(meta_data)
+        if not http_referer or http_referer == "":
+            return False
         if http_referer[-13:] != 'instagram.com':
             return False
         qs = AdViewerDetail.objects.filter(influencer_ad=inf_ad.id, ip=ip)
@@ -207,7 +205,7 @@ class InfluencerWallet(APIView):
         for item in qs:
             ser = self.serializer_class(item)
             res = {
-                "income": item.clicks * COST_PER_CLICK,
+                "income": item.clicks * settings.COST_PER_CLICK,
                 "influencer_ad": ser.data
             }
             result.append(res)
