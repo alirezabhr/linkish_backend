@@ -4,7 +4,7 @@ from .models import Ad, InfAd, SuggestAd, AdViewerDetail
 
 
 class AdSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = Ad
@@ -12,7 +12,7 @@ class AdSerializer(serializers.ModelSerializer):
 
 
 class SuggestAdSerializer2(serializers.ModelSerializer):
-    suggested_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    suggested_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = SuggestAd
@@ -20,7 +20,7 @@ class SuggestAdSerializer2(serializers.ModelSerializer):
 
 
 class SuggestAdSerializer(serializers.ModelSerializer):
-    suggested_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    suggested_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = SuggestAd
@@ -29,7 +29,7 @@ class SuggestAdSerializer(serializers.ModelSerializer):
 
 
 class InfAdSerializer(serializers.ModelSerializer):
-    approved_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    approved_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = InfAd
@@ -37,7 +37,7 @@ class InfAdSerializer(serializers.ModelSerializer):
 
 
 class InfAdSerializer2(serializers.ModelSerializer):
-    approved_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    approved_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = InfAd
@@ -46,7 +46,7 @@ class InfAdSerializer2(serializers.ModelSerializer):
 
 
 class AdViewerDetailSerializer(serializers.ModelSerializer):
-    viewed_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+    viewed_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = AdViewerDetail
