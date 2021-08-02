@@ -55,12 +55,11 @@ class InfluencerSerializer(serializers.ModelSerializer):
 
 
 class OTPSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = OTP
         fields = "__all__"
-
-    read_only_fields = ("id",)
 
 
 class TopicSerializer(serializers.ModelSerializer):
@@ -70,6 +69,8 @@ class TopicSerializer(serializers.ModelSerializer):
 
 
 class WithdrawSerializer(serializers.ModelSerializer):
+    request_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+
     class Meta:
         model = Withdraw
         fields = '__all__'
