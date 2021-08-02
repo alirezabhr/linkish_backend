@@ -102,7 +102,7 @@ class InfluencerAdView(APIView):
         suggested_ad = get_object_or_404(SuggestAd, pk=suggested_ad_id)
         data['clicks'] = 0
         data['views'] = 0
-        data['deduction'] = random.randint(0, len(self.deduction_list))
+        data['deduction'] = self.deduction_list[random.randint(0, len(self.deduction_list))]
         data['short_link'] = adUtils.get_random_link(InfAd)
         if suggested_ad.influencer.id != pk:
             res = {
@@ -170,6 +170,18 @@ class AdClickDetailView(APIView):
             return False
         return True
 
+    def increaseViews(self, influencer_ad):
+        influencer_ad.views += 1
+        influencer_ad.suggested_ad.ad.views += 1
+        influencer_ad.save()
+        influencer_ad.suggested_ad.ad.save()
+
+    def increaseClicks(self, influencer_ad):
+        influencer_ad.clicks += 1
+        influencer_ad.suggested_ad.ad.clicks += 1
+        influencer_ad.save()
+        influencer_ad.suggested_ad.ad.save()
+
     def get(self, request, *args, **kwargs):
         short_url = kwargs["short_url"]
         influencer_ad = get_object_or_404(InfAd, short_link__exact=short_url)
@@ -182,18 +194,10 @@ class AdClickDetailView(APIView):
             if adUtils.is_in_iran(ip):
                 url = influencer_ad.suggested_ad.ad.base_link
                 if self.is_valid_request(influencer_ad, ip, request.META):
-                    influencer_ad.clicks += 1
-                    influencer_ad.views += 1
-                    influencer_ad.suggested_ad.ad.clicks += 1
-                    influencer_ad.suggested_ad.ad.views += 1
-                    influencer_ad.save()
-                    influencer_ad.suggested_ad.ad.save()
+                    self.increaseViews(influencer_ad=influencer_ad)
+                    self.increaseClicks(influencer_ad=influencer_ad)
                 else:
-                    influencer_ad.views += 1
-                    influencer_ad.suggested_ad.ad.views += 1
-                    influencer_ad.save()
-                    influencer_ad.suggested_ad.ad.save()
-
+                    self.increaseViews(influencer_ad=influencer_ad)
                 self.create_ad_viewer_detail(influencer_ad, ip, request.META)
                 return HttpResponseRedirect(url)
             else:
@@ -211,7 +215,7 @@ class InfluencerWallet(APIView):
         for item in qs:
             ser = self.serializer_class(item)
             res = {
-                "income": item.clicks * settings.COST_PER_CLICK,
+                "income": int(item.clicks * ((100-item.deduction)/100)) * settings.COST_PER_CLICK,
                 "influencer_ad": ser.data
             }
             result.append(res)
