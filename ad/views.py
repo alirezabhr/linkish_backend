@@ -12,7 +12,8 @@ from rest_framework.permissions import AllowAny
 
 from users.models import Influencer
 from .models import Ad, InfAd, SuggestAd, AdViewerDetail
-from .serializers import AdSerializer, InfAdSerializer, SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2
+from .serializers import AdSerializer, InfAdSerializer,\
+    SuggestAdSerializer, SuggestAdSerializer2, InfAdSerializer2, AdViewerDetailSerializer
 from . import utils as adUtils
 from users.utils import send_suggest_ad_email
 
@@ -85,9 +86,10 @@ class SuggestAdView(APIView):
 
 class InfluencerAdView(APIView):
     serializer_class = InfAdSerializer
-    deduction_list = [10, 10, 10, 10, 10, 9, 9, 9, 9,
-                      8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6,
-                      5, 5, 4, 4, 3, 3, 2, 2, 1, 0]
+    deduction_list = [0, 1, 2, 2, 3, 3, 4, 4,
+                      5, 5, 6, 6, 6, 7, 7, 7,
+                      7, 8, 8, 8, 8, 9, 9, 9,
+                      9, 10, 10, 10, 10, 10]
 
     def post(self, request, pk):
         get_object_or_404(Influencer, pk=pk)
@@ -153,14 +155,17 @@ class AdClickDetailView(APIView):
     permission_classes = [AllowAny]
 
     def create_ad_viewer_detail(self, inf_ad, ip, meta_data):
-        ad_viewer_detail = AdViewerDetail()
-        ad_viewer_detail.influencer_ad = inf_ad.id
-        ad_viewer_detail.ip = ip
-        ad_viewer_detail.http_referer = adUtils.get_http_referer(meta_data)
-        ad_viewer_detail.save()
+        data = {
+            "influencer_ad": inf_ad.id,
+            "ip": ip,
+            "http_referer": meta_data.get('HTTP_REFERER')
+        }
+        ser = AdViewerDetailSerializer(data=data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
 
     def is_valid_request(self, inf_ad, ip, meta_data):
-        http_referer = adUtils.get_http_referer(meta_data)
+        http_referer = meta_data.get('HTTP_REFERER')
         if not http_referer or http_referer == "":
             return False
         if http_referer[-13:] != 'instagram.com':
@@ -214,9 +219,11 @@ class InfluencerWallet(APIView):
 
         for item in qs:
             ser = self.serializer_class(item)
+            new_click = int(item.clicks * ((100-item.deduction)/100))
             res = {
-                "income": int(item.clicks * ((100-item.deduction)/100)) * settings.COST_PER_CLICK,
-                "influencer_ad": ser.data
+                "income": new_click * settings.COST_PER_CLICK,
+                "deduction": item.deduction,
+                "influencer_ad": ser.data,
             }
             result.append(res)
 
