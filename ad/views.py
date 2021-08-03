@@ -168,9 +168,9 @@ class AdClickDetailView(APIView):
         http_referer = meta_data.get('HTTP_REFERER')
         if not http_referer or http_referer == "":
             return False
-        if http_referer[-13:] != 'instagram.com':
+        if http_referer[-14:-1] != 'instagram.com':
             return False
-        qs = AdViewerDetail.objects.filter(influencer_ad=inf_ad.id, ip=ip)
+        qs = AdViewerDetail.objects.filter(influencer_ad=inf_ad.id, ip=ip, http_referer__icontains='instagram.com')
         if len(qs) != 0:
             return False
         return True
