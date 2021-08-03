@@ -219,9 +219,9 @@ class InfluencerWallet(APIView):
 
         for item in qs:
             ser = self.serializer_class(item)
-            new_click = int(item.clicks * ((100-item.deduction)/100))
             res = {
-                "income": new_click * settings.COST_PER_CLICK,
+                "clicks": item.clicks,
+                "cpc": settings.COST_PER_CLICK,
                 "deduction": item.deduction,
                 "influencer_ad": ser.data,
             }
