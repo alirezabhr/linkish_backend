@@ -55,3 +55,6 @@ class AdViewerDetail(models.Model):
     ip = models.CharField(max_length=80)
     http_referer = models.CharField(max_length=60, null=True)
     viewed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.id) + ": " + str(self.viewed_at) + ' -> ' + self.http_referer + ' -> ' + self.ip
